@@ -1,16 +1,16 @@
 # Importing the Streamlit library
 import streamlit as st
+from src.data_extractor.web_scapper import web_scrap
 
 # The main function for the Streamlit app
 def main():
-    # Title of the web app
-    st.title("Simple Streamlit App")
+    st.title("Skill Analyzer")
+    user_input = st.text_input("Enter role:")
 
-    # A text input for the user to enter text
-    user_input = st.text_input("Enter some text:")
+    op = web_scrap(job_title=user_input).extract_page_limit()
 
-    # Display the entered text
-    st.write("You entered:", user_input)
+    # for div in divs:
+    st.write("parsed:", op)
 
 # Run the app
 if __name__ == "__main__":
