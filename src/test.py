@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-url1 = "https://www.seek.com.au/job/73035592"
+url1 = "https://www.seek.com.au/job/72923201"
 url2 = "https://www.seek.com.au/pyspark-jobs?page=1"
 
 # Send a GET request to the URL
@@ -30,9 +30,11 @@ else:
 # print(soup.prettify())
 # print(target_div.get_text(strip=True))
 
-divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6u')
+divs = soup.find_all('div', class_='_1wkzzau0 _1pehz540')
+print(len(divs))
 for div in divs:
     print(div.get_text())    
+    
 
 # divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6q')
 # for div in divs:

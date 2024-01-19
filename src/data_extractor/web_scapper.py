@@ -81,29 +81,38 @@ class web_scrap:
                         parsed_url = urlparse(href)
                         self.job_number = parsed_url.path.split('/')[-1]
 
-                        print(self.job_number)
-
                         soup = self.request_page_by_job()
 
-                        divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6u')
+                        divs_header = soup.find_all('div', class_='_1wkzzau0 a1msqi6q a1msqi6v')
+                        divs_subheader = soup.find_all('div', class_='_1wkzzau0 a1msqi6u')
+                        divs_body = soup.find_all('div', class_='_1wkzzau0 _1pehz540')
 
-                        # for div in divs:
-                        #     print(div.get_text())
+                        role = divs_header[0].get_text()
+                        company = divs_header[1].get_text()
+                        desc = divs_body[0].get_text()
 
                         pay = ""
+
+                        # print(self.job_number)
+                        # print(len(divs))
+
                         try: 
-                            pay = divs[3].get_text()
+                            pay = divs_subheader[3].get_text()
+
                         except Exception as e:
                             print(e, 'here is it!!!!!!!!!!!!')
 
                         job_details['job_id_' + str(self.job_number)] = {
-                            'url': self.url_page, 
+                            'url': self.url_job, 
                             'pagenum': self.curr_pagenum,
                             'header': {
-                                'location': divs[0].get_text(),
-                                'class': divs[1].get_text(),
-                                'work_type': divs[2].get_text(),
-                                'pay': pay}}
+                                'role': role,
+                                'company': company,
+                                'location': divs_subheader[0].get_text(),
+                                'class': divs_subheader[1].get_text(),
+                                'work_type': divs_subheader[2].get_text(),
+                                'pay': pay,
+                                'desc': desc}}
 
                     self.curr_pagenum += 1 
 
