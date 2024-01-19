@@ -30,9 +30,9 @@ else:
 # print(soup.prettify())
 # print(target_div.get_text(strip=True))
 
-# divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6u')
-# for div in divs:
-#     print(div.get_text())    
+divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6u')
+for div in divs:
+    print(div.get_text())    
 
 # divs = soup.find_all('div', class_='_1wkzzau0 a1msqi6q')
 # for div in divs:
@@ -54,10 +54,6 @@ if response.status_code == 200:
 else:
     print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
-
-# job_ids = [element.get('data-job-id') for element in elements]
-# for job_id in job_ids:
-#     print(f'Job ID: {job_id}')
 
 # divs = soup.find_all('div', class_='_1wkzzau0 szurmz0 szurmz7')                
 # divs = soup.find_all('nav', class_='_1wkzzau0 _1wkzzau1')
