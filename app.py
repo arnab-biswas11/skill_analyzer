@@ -7,9 +7,8 @@ def main():
     st.title("Skill Analyzer")
     user_input = st.text_input("Enter role:")
 
-    op = web_scrap(job_title=user_input).extract_page_limit()
+    op = web_scrap(job_title=user_input).extract_jobs()
 
-    # for div in divs:
     st.write("parsed:", op)
 
 # Run the app

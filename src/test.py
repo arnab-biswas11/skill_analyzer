@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 url1 = "https://www.seek.com.au/job/73035592"
-url2 = "https://www.seek.com.au/data-analyst-jobs?page=25"
+url2 = "https://www.seek.com.au/pyspark-jobs?page=1"
 
 # Send a GET request to the URL
 response = requests.get(url1)
@@ -54,6 +54,16 @@ if response.status_code == 200:
 else:
     print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
-divs = soup.find_all('nav', class_='_1wkzzau0 _1wkzzau1')
-for div in divs:
-    print(div.get_text())    
+
+# job_ids = [element.get('data-job-id') for element in elements]
+# for job_id in job_ids:
+#     print(f'Job ID: {job_id}')
+
+# divs = soup.find_all('div', class_='_1wkzzau0 szurmz0 szurmz7')                
+# divs = soup.find_all('nav', class_='_1wkzzau0 _1wkzzau1')
+# page_num_range = divs[2].get_text()
+# print(page_num_range)
+# page_num_range = str(page_num_range)
+# page_num_range = re.search(r"\d+", page_num_range).group(0)
+# for div in divs:
+#     print(div.get_text())
