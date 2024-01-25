@@ -49,7 +49,7 @@ def web_scrap_jobs(sp_data,text_page_num, input_page_limit):
 
     return jobs
 
-def extract_skills_from_scapped(input_role, input_num_skills, jobs):
+def extract_skills_from_scapped(input_role, jobs):
             
             data = pull_skill(job_details=jobs)
 
@@ -60,7 +60,7 @@ def extract_skills_from_scapped(input_role, input_num_skills, jobs):
             # Count occurrences of each skill
             skill_counts = Counter()
 
-            top_skills = dict(skill_counts.most_common(input_num_skills))
+            top_skills = dict(skill_counts.most_common(10))
             skills_df = pd.DataFrame(list(top_skills.items()), 
                                      columns=['Skill', 'Number of Job Ads'])
 
@@ -81,7 +81,7 @@ def extract_skills_from_scapped(input_role, input_num_skills, jobs):
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 for skill_job in data.job_iter_batch(input_role):
                     skill_counts.update(skill_job)
-                    top_skills = dict(skill_counts.most_common(input_num_skills))
+                    top_skills = dict(skill_counts.most_common(10))
                     skills_df = pd.DataFrame(list(top_skills.items()), 
                                              columns=['Skill', 'Number of Job Ads'])
 
@@ -109,35 +109,31 @@ def main():
         st.session_state.confirmation_button = False
         st.session_state.input_role = ""
         st.session_state.input_page_limit = ""
-        st.session_state.input_page_limit = ""
 
     # User inputs
     input_role = st.text_input("Enter role:")
     input_page_limit = st.selectbox('Select page count', ('1', '2', '5', '10', '20', 'all pages'))
-    input_num_skills = st.slider('How many skills to visualize?', 0, 30, 10)
     
     # Confirmation button
     confirmation_button = st.button("Click to evaluate")
 
     # Reset confirmation button if user changes inputs
     if input_role != st.session_state.input_role \
-        or input_page_limit != st.session_state.input_page_limit \
-              or input_num_skills != st.session_state.input_num_skills:
+        or input_page_limit != st.session_state.input_page_limit:
         st.session_state.confirmation_button = False
 
     if confirmation_button:
-        if input_role and input_page_limit and input_num_skills:
+        if input_role and input_page_limit:
             st.session_state.confirmation_button = True
             st.session_state.input_role = input_role
             st.session_state.input_page_limit = input_page_limit
-            st.session_state.input_num_skills = input_num_skills
 
             global scrapped_data, extracted_skills  
 
             if scrapped_data is None:
                 scrapped_data = web_scrap(job_title=input_role).extract_jobs()
                 text_page_num = st.text("")
-                jobs = web_scrap_jobs(scrapped_data,text_page_num, input_page_limit)
+                jobs = web_scrap_jobs(scrapped_data,text_page_num)
 
             jobs_df = pd.DataFrame(jobs)
             header_df = pd.json_normalize(jobs_df['header'])
@@ -149,7 +145,7 @@ def main():
                 file_name='jobs_data.csv',
                 mime='text/csv')
             
-            extract_skills_from_scapped(input_role, input_num_skills, jobs)
+            extract_skills_from_scapped(input_role, jobs)
 
 
 # Run the app
