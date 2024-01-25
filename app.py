@@ -100,6 +100,8 @@ def extract_skills_from_scapped(input_role, jobs):
                     progress_bar.progress((prog + 1) / n_jobs)
                     prog += 1
 
+            progress_bar.empty()
+
 
 def main():
     st.title("Skill Analyzer")
