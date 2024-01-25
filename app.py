@@ -133,7 +133,7 @@ def main():
             if scrapped_data is None:
                 scrapped_data = web_scrap(job_title=input_role).extract_jobs()
                 text_page_num = st.text("")
-                jobs = web_scrap_jobs(scrapped_data,text_page_num)
+                jobs = web_scrap_jobs(scrapped_data,text_page_num,input_page_limit)
 
             jobs_df = pd.DataFrame(jobs)
             header_df = pd.json_normalize(jobs_df['header'])
