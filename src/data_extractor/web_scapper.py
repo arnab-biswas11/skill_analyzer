@@ -58,6 +58,7 @@ class web_scrap:
     def extract_jobs(self):
 
         result = None
+        n_job = 0
         job_details = {}
         job_details['title'] = self.job_title
         job_details['pagination'] = []
@@ -76,6 +77,7 @@ class web_scrap:
 
                     div_elements  = soup.find_all('div', class_='_1wkzzau0 a1msqi4y a1msqi4w')
                     hrefs = [div.find('a')['href'] for div in div_elements if div.find('a')]
+                    num_jobs_page = len(hrefs)
 
                     for href in hrefs:
                         parsed_url = urlparse(href)
@@ -102,23 +104,27 @@ class web_scrap:
                         except Exception as e:
                             print(e, 'here is it!!!!!!!!!!!!')
 
-                        job_details['job_id_' + str(self.job_number)] = {
+                        job_spec = {
                             'url': self.url_job, 
                             'pagenum': self.curr_pagenum,
                             'header': {
                                 'role': role,
                                 'company': company,
                                 'location': divs_subheader[0].get_text(),
-                                'class': divs_subheader[1].get_text(),
+                                'category': divs_subheader[1].get_text(),
                                 'work_type': divs_subheader[2].get_text(),
-                                'pay': pay,
-                                'desc': desc}}
+                                'pay': pay if pay!="Your application will include the following questions:" else "",
+                                'job_desc': desc}}
+
+                        job_details['job_id_' + str(self.job_number)] = job_spec
+                        
+                        yield job_spec, num_jobs_page, self.curr_pagenum
+
+                        n_job += 1
 
                     self.curr_pagenum += 1 
 
             except Exception as e:
                 print(e)
  
-        return job_details
-
-print(web_scrap(job_title="pyspark").extract_jobs())
+# print(web_scrap(job_title="pyspark").extract_jobs())

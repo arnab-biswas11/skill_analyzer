@@ -1,4 +1,8 @@
-beautifulsoup4
-requests==2.31.0
-streamlit==1.16.0
 altair<5
+beautifulsoup4
+pandas
+requests==2.31.0
+skillNer==1.0.3
+spacy>=3.0.0,<4.0.0
+streamlit==1.16.0
+https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl
