@@ -1,12 +1,8 @@
-import spacy
-from spacy.matcher import PhraseMatcher
-from skillNer.general_params import SKILL_DB
-from skillNer.skill_extractor_class import SkillExtractor
-import concurrent.futures
+from ojd_daps_skills.pipeline.extract_skills.extract_skills import ExtractSkills
+from collections import Counter
 
-
-nlp = spacy.load("en_core_web_lg")
-skill_extractor = SkillExtractor(nlp, SKILL_DB, PhraseMatcher)
+es = ExtractSkills(config_name="extract_skills_lightcast", local=False)
+es.load()
 
 class pull_skill:
 
@@ -14,27 +10,17 @@ class pull_skill:
                  job_details) -> None:
         self.job_details = job_details
 
-    def skill_extract(self, job_description, role):
+    def skill_ext(self):
 
-        keyword_doc = nlp(role.lower())
-        skills = skill_extractor.annotate(job_description)        
-        skill_set = set(
-            [entry["doc_node_value"] 
-             for entry in skills["results"]["full_matches"] + skills["results"]["ngram_scored"]
-             if keyword_doc.similarity(nlp(entry["doc_node_value"].lower())) < 0.7]
-             )
+        job_skills_matched = es.extract_skills(self.job_details)
 
-        return skill_set
+        skill_counter = Counter()
 
-    def job_iter_batch(self, role):
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            # Process job descriptions in batches concurrently
-            future_to_job = {executor.submit(self.skill_extract, job['header']['job_desc'], role): job for job in self.job_details}
-            for future in concurrent.futures.as_completed(future_to_job):
-                try:
-                    skills = future.result()
-                    yield skills
-                except Exception as e:
-                    # Handle any exceptions during skill extraction
-                    print(f"Exception occurred: {e}")
+        for entry in job_skills_matched:
+            skills = entry['SKILL']
+            for potential_skill, (hier_skill, identifier) in skills:
+                # Determine whether to use the skill or the identifier
+                skill_to_count = hier_skill if len(identifier) != 20 else potential_skill
+                skill_counter[skill_to_count] += 1
 
+        return skill_counter

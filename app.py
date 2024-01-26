@@ -1,17 +1,15 @@
 import streamlit as st
-from collections import Counter
 import pandas as pd
-import concurrent.futures
 import altair as alt
 from src.data_extractor.web_scapper import web_scrap
 from src.data_extractor.skill_extract import pull_skill
-import base64
 
 scrapped_data = None
 extracted_skills = None
 
 def web_scrap_jobs(sp_data,text_page_num, input_page_limit):
     jobs = []
+    jd_list = []
     prog = 0
     progress_bar_container = st.empty()
     progress_bar = progress_bar_container.progress(0)
@@ -34,6 +32,7 @@ def web_scrap_jobs(sp_data,text_page_num, input_page_limit):
                     break
 
                 jobs.append(job[0])
+                jd_list.append(job[0]['header']['job_desc'])
                 text_page = "Scanning page " + str(job[2])
                 text_page_num.text(text_page)
                 progress_bar.progress((prog + 1) / job[1])
@@ -47,58 +46,28 @@ def web_scrap_jobs(sp_data,text_page_num, input_page_limit):
             n_jobs = len(jobs)
             st.success(f"Scrapped {n_jobs} job listings successfully!")
 
-    return jobs
+    return jobs, jd_list
 
-def extract_skills_from_scapped(input_role, jobs):
+def extract_skills_from_scapped(jd_list):
             
-            data = pull_skill(job_details=jobs)
+    data = pull_skill(jd_list).skill_ext()
 
-            prog = 0
-            progress_bar_container = st.empty()
-            progress_bar = progress_bar_container.progress(0)
+    top_skills = dict(data.most_common(10))
+    skills_df = pd.DataFrame(list(top_skills.items()), 
+                                columns=['Skill', 'Number of Job Ads'])
 
-            # Count occurrences of each skill
-            skill_counts = Counter()
+    # Create Altair chart
+    chart = alt.Chart(skills_df).mark_bar().encode(
+        x=alt.X('Skill:O', 
+                sort=alt.EncodingSortField(field='Number of Job Ads', 
+                                            op='sum', order='descending')),
+        y='Number of Job Ads:Q'
+    ).properties(
+        title='Top Skills in Job Ads'
+    )
 
-            top_skills = dict(skill_counts.most_common(10))
-            skills_df = pd.DataFrame(list(top_skills.items()), 
-                                     columns=['Skill', 'Number of Job Ads'])
-
-            # Create Altair chart
-            chart = alt.Chart(skills_df).mark_bar().encode(
-                x=alt.X('Skill:O', 
-                        sort=alt.EncodingSortField(field='Number of Job Ads', 
-                                                   op='sum', order='descending')),
-                y='Number of Job Ads:Q'
-            ).properties(
-                title='Top Skills in Job Ads'
-            )
-
-            dp_chart = st.altair_chart(chart, use_container_width=True)
-            n_jobs = len(jobs)
+    st.altair_chart(chart, use_container_width=True)
             
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                for skill_job in data.job_iter_batch(input_role):
-                    skill_counts.update(skill_job)
-                    top_skills = dict(skill_counts.most_common(10))
-                    skills_df = pd.DataFrame(list(top_skills.items()), 
-                                             columns=['Skill', 'Number of Job Ads'])
-
-                    chart = alt.Chart(skills_df).mark_bar().encode(
-                        x=alt.X('Skill:O', 
-                                sort=alt.EncodingSortField(field='Number of Job Ads', 
-                                                           op='sum', order='descending')),
-                        y='Number of Job Ads:Q'
-                    ).properties(
-                        title='Top Skills in Job Ads'
-                    )
-
-                    dp_chart.altair_chart(chart, use_container_width=True)
-
-                    progress_bar.progress((prog + 1) / n_jobs)
-                    prog += 1
-
-            progress_bar.empty()
 
 
 def main():
@@ -149,7 +118,9 @@ def main():
             if scrapped_data is None:
                 scrapped_data = web_scrap(job_title=input_role).extract_jobs()
                 text_page_num = st.text("")
-                jobs = web_scrap_jobs(scrapped_data,text_page_num,input_page_limit)
+                return_jobs = web_scrap_jobs(scrapped_data,text_page_num,input_page_limit)
+                jobs = return_jobs[0]
+                jd_list = return_jobs[1]
 
             jobs_df = pd.DataFrame(jobs)
             header_df = pd.json_normalize(jobs_df['header'])
@@ -165,7 +136,7 @@ def main():
             st.markdown("---")
 
             with st.spinner("Visualising top skills from scanned job descriptions..."):
-                extract_skills_from_scapped(input_role, jobs)
+                extract_skills_from_scapped(jd_list)
 
 
 # Run the app
