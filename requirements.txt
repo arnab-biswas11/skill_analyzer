@@ -2,7 +2,6 @@ altair<5
 beautifulsoup4
 pandas
 requests==2.31.0
-skillNer==1.0.3
 spacy>=3.0.0,<4.0.0
 streamlit==1.16.0
 IPython
