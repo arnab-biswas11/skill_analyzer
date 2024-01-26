@@ -2,7 +2,6 @@ altair<5
 beautifulsoup4
 pandas
 requests
-spacy
 streamlit
 IPython
 ojd_daps_skills
