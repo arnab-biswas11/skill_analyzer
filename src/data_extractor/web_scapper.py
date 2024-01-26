@@ -18,13 +18,12 @@ class web_scrap:
         self.job_title = job_title
         self.curr_pagenum = curr_pagenum
         self.job_number = job_number
-    
+
     def request_page_by_num(self):
 
         self.url_page = global_url_page + self.job_title.replace(" ","-") + "-jobs?page=" + str(self.curr_pagenum)
         print(self.url_page)
         
-
         response = requests.get(self.url_page)
 
         # Check if the request was successful (status code 200)
@@ -37,11 +36,9 @@ class web_scrap:
         else:
             print(f"Failed to retrieve the page. Status code: {response.status_code} for job title {self.job_title} and page {self.curr_pagenum}" )
 
-
     def request_page_by_job(self):
 
         self.url_job = global_url_job + str(self.job_number)
-        print(self.url_job)
 
         response = requests.get(self.url_job)
 
@@ -95,9 +92,6 @@ class web_scrap:
 
                         pay = ""
 
-                        # print(self.job_number)
-                        # print(len(divs))
-
                         try: 
                             pay = divs_subheader[3].get_text()
 
@@ -127,4 +121,3 @@ class web_scrap:
             except Exception as e:
                 print(e)
  
-# print(web_scrap(job_title="pyspark").extract_jobs())

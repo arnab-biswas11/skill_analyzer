@@ -5,7 +5,7 @@ import concurrent.futures
 import altair as alt
 from src.data_extractor.web_scapper import web_scrap
 from src.data_extractor.skill_extract import pull_skill
-
+import base64
 
 scrapped_data = None
 extracted_skills = None
@@ -72,7 +72,6 @@ def extract_skills_from_scapped(input_role, jobs):
                 y='Number of Job Ads:Q'
             ).properties(
                 title='Top Skills in Job Ads'
-                # ,width=alt.Step(80)
             )
 
             dp_chart = st.altair_chart(chart, use_container_width=True)
@@ -92,7 +91,6 @@ def extract_skills_from_scapped(input_role, jobs):
                         y='Number of Job Ads:Q'
                     ).properties(
                         title='Top Skills in Job Ads'
-                        # ,width=alt.Step(80)
                     )
 
                     dp_chart.altair_chart(chart, use_container_width=True)
@@ -104,7 +102,21 @@ def extract_skills_from_scapped(input_role, jobs):
 
 
 def main():
+
     st.title("Skill Analyzer")
+
+    st.write("Welcome to the Skill Analyzer app! \
+             This tool helps you scrap data from \
+             current job listings at www.seek.com.au \
+              and visualise the most in demand skills for \
+              the role of your choice.")
+
+    st.write("To get started, enter the desired role and select \
+              the page count, then click 'Click to evaluate'. \
+             Selecting a higher page count would take more time to \
+             extract live job postings but would also extract more jobs!")
+
+    st.markdown("---")
 
     # Initialize session_state variables
     if 'confirmation_button' not in st.session_state:
@@ -118,6 +130,8 @@ def main():
     
     # Confirmation button
     confirmation_button = st.button("Click to evaluate")
+
+    st.markdown("---")
 
     # Reset confirmation button if user changes inputs
     if input_role != st.session_state.input_role \
@@ -141,13 +155,17 @@ def main():
             header_df = pd.json_normalize(jobs_df['header'])
             jobs_df = pd.concat([jobs_df['url'], header_df], axis=1)
 
+            st.write("Download web scapped jobs as CSV")
             st.download_button(
-                label='Download web scapped jobs as CSV',
+                label=':anchor:',
                 data=jobs_df.to_csv(index=False, encoding='utf-8', errors='replace'),
                 file_name='jobs_data.csv',
                 mime='text/csv')
             
-            extract_skills_from_scapped(input_role, jobs)
+            st.markdown("---")
+
+            with st.spinner("Visualising top skills from scanned job descriptions..."):
+                extract_skills_from_scapped(input_role, jobs)
 
 
 # Run the app
