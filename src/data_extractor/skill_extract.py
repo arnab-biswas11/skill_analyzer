@@ -1,7 +1,7 @@
 from ojd_daps_skills.pipeline.extract_skills.extract_skills import ExtractSkills
 from collections import Counter
 
-es = ExtractSkills(config_name="extract_skills_lightcast", local=True)
+es = ExtractSkills(config_name="extract_skills_lightcast", local=False)
 es.load()
 
 class pull_skill:
