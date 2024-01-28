@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 from src.data_extractor.web_scapper import web_scrap
-from src.data_extractor.skill_extract import pull_skill
+from src.skill_extract import pull_skill
 
 scrapped_data = None
 extracted_skills = None

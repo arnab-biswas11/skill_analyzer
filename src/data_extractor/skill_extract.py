@@ -1,8 +1,10 @@
-from ojd_daps_skills.pipeline.extract_skills.extract_skills import ExtractSkills
+from skills.pipeline.extract_skills.extract_skills import ExtractSkills
 from collections import Counter
 
-es = ExtractSkills(config_name="extract_skills_lightcast", local=False)
+es = ExtractSkills(config_name="extract_skills_lightcast", local=True)
 es.load()
+
+# pip install git+https://github.com/nestauk/ojd_daps_skills.git@dev
 
 class pull_skill:
 
