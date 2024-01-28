@@ -1,4 +1,4 @@
-from src.skills.extract_skills import ExtractSkills
+from skills.extract_skills import ExtractSkills
 from collections import Counter
 
 es = ExtractSkills(config_name="extract_skills_lightcast", local=True)
