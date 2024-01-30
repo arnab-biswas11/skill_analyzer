@@ -9,9 +9,9 @@ from src.skills.skill_ner_mapper import SkillMapper
 from src.skills.extract_skills_utils import (
     load_toy_taxonomy,
 )
-from src.skills.data_getters import load_file
-from src.skills.download_public_data import download
-from src.skills.vars import logger, PROJECT_DIR, PUBLIC_DATA_FOLDER_NAME
+# from src.skills.data_getters import load_file
+# from src.skills.download_public_data import download
+# from src.skills.vars import logger, PROJECT_DIR, PUBLIC_DATA_FOLDER_NAME
 
 import yaml
 import os
@@ -59,10 +59,10 @@ class ExtractSkills(object):
         self.local = local
         self.verbose = verbose
         self.multi_process = multi_process
-        if self.verbose:
-            logger.setLevel(logging.INFO)
-        else:
-            logger.setLevel(logging.ERROR)
+        # if self.verbose:
+        #     logger.setLevel(logging.INFO)
+        # else:
+        #     logger.setLevel(logging.ERROR)
         if self.local:
             self.s3 = False
             self.base_path = ""
@@ -156,7 +156,7 @@ class ExtractSkills(object):
 
         self.labels = self.nlp.get_pipe("ner").labels + ("MULTISKILL",)
 
-        logger.info(f"Loading '{self.taxonomy_name}' taxonomy information")
+        # logger.info(f"Loading '{self.taxonomy_name}' taxonomy information")
         if self.taxonomy_name == "toy":
             self.taxonomy_skills = load_toy_taxonomy()
         else:
@@ -202,9 +202,9 @@ class ExtractSkills(object):
             )
 
         if taxonomy_embedding_file_name:
-            logger.info(
-                f"Loading taxonomy embeddings from {taxonomy_embedding_file_name}"
-            )
+            # logger.info(
+            #     f"Loading taxonomy embeddings from {taxonomy_embedding_file_name}"
+            # )
             _ = self.skill_mapper.load_taxonomy_embeddings(
                 taxonomy_embedding_file_name, s3=self.s3
             )
@@ -213,9 +213,9 @@ class ExtractSkills(object):
             self.taxonomy_skills_embeddings_loaded = False
 
         if prev_skill_matches_file_name:
-            logger.info(
-                f"Loading pre-defined or previously found skill mappings from {prev_skill_matches_file_name}"
-            )
+            # logger.info(
+            #     f"Loading pre-defined or previously found skill mappings from {prev_skill_matches_file_name}"
+            # )
             self.prev_skill_matches = self.skill_mapper.load_ojo_esco_mapper(
                 self.prev_skill_matches_file_name, s3=self.s3
             )
@@ -224,9 +224,9 @@ class ExtractSkills(object):
             self.prev_skill_matches = None
 
         if hard_labelled_skills_name:
-            logger.info(
-                f"Loading hard coded skill mappings for top skills in {hard_labelled_skills_name}"
-            )
+            # logger.info(
+            #     f"Loading hard coded skill mappings for top skills in {hard_labelled_skills_name}"
+            # )
             self.hard_coded_skills = self.skill_mapper.load_ojo_esco_mapper(
                 self.hard_labelled_skills_file_name, s3=self.s3
             )
@@ -270,9 +270,9 @@ class ExtractSkills(object):
         skill_dict["MULTISKILL"] = multiskills
         skill_dict["EXPERIENCE"] = []
 
-        logger.info(
-            f"reformatted list of skills to map to '{self.taxonomy_name}' taxonomy"
-        )
+        # logger.info(
+        #     f"reformatted list of skills to map to '{self.taxonomy_name}' taxonomy"
+        # )
 
         return [skill_dict]
 
@@ -335,15 +335,15 @@ class ExtractSkills(object):
 
         job_skills, skill_hashes = self.skill_mapper.preprocess_job_skills(skills)
         if len(skill_hashes) != 0:
-            logger.info(
-                f"Mapping {len(skill_hashes)} skills to the '{self.taxonomy_name}' taxonomy"
-            )
+            # logger.info(
+            #     f"Mapping {len(skill_hashes)} skills to the '{self.taxonomy_name}' taxonomy"
+            # )
             if self.prev_skill_matches:
                 orig_num = len(skill_hashes)
                 skill_hashes = self.skill_mapper.filter_skill_hash(
                     skill_hashes, self.prev_skill_matches
                 )
-                logger.info(f"{orig_num - len(skill_hashes)} mappings previously found")
+                # logger.info(f"{orig_num - len(skill_hashes)} mappings previously found")
 
             if not self.taxonomy_skills_embeddings_loaded:
                 # If we didn't already load the embeddings, then calculate them
@@ -452,9 +452,9 @@ class ExtractSkills(object):
         """
         if format_skills:
             skills = self.format_skills(job_adverts_skills)
-            logger.info(
-                f"formatted {len(job_adverts_skills)} skill(s) from skills list..."
-            )
+            # logger.info(
+            #     f"formatted {len(job_adverts_skills)} skill(s) from skills list..."
+            # )
         else:
             skills = self.get_skills(job_adverts_skills)
 
