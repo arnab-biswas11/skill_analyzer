@@ -71,6 +71,6 @@ logger.propagate = False
 _base_config_path = Path(__file__).parent.resolve() / "config/base.yaml"
 config = get_yaml_config(_base_config_path)
 
-bucket_name = "open-jobs-lake"
+bucket_name = "skill-data-model"
 
-PUBLIC_DATA_FOLDER_NAME = "data"
+PUBLIC_DATA_FOLDER_NAME = ""

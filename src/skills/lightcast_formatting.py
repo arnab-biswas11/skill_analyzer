@@ -12,9 +12,10 @@ hierarchy_levels: If a skill then which hierarchy levels is it in
 To run the script, python ojd_daps_skills/pipeline/skill_ner_mapping/lightcast_formatting.py --client-id CLIENT_ID --client-secret CLIENT_SECRET
 """
 
-from skills import bucket_name
-from src.skills.pipeline.evaluation.lightcast_evaluation import (
-    get_lightcast_access_token,
+from src.skills.vars import bucket_name
+from src.skills.data_getters import (
+    get_s3_resource,
+    save_to_s3,
 )
 
 import pandas as pd

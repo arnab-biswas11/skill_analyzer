@@ -59,7 +59,6 @@ This might give the result:
 - the skill level 1 group 'communicate verbally' (code 'A1.3') is the closest to thie ojo skill with distance 0.98
 """
 from src.skills.vars import config, bucket_name, PROJECT_DIR, logger
-
 from src.skills.data_getters import (
     get_s3_resource,
     save_to_s3,
@@ -76,20 +75,14 @@ from src.skills.text_cleaning import clean_text, short_hash
 import logging
 from argparse import ArgumentParser
 from sentence_transformers import SentenceTransformer
-import re
-import time
-import itertools
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pd
-import os
-
+import pkg_resources
 import ast
-import boto3
-import yaml
+import json
 
-
-# S3 = get_s3_resource()
+S3 = get_s3_resource()
 
 
 class SkillMapper:
@@ -203,9 +196,12 @@ class SkillMapper:
 
         return self.clean_ojo_skills, self.skill_hashes
 
-    def load_taxonomy_skills(self, tax_input_file_name, s3=False):
+    def load_taxonomy_skills(self, s3=False):
         # load taxonomy skills
-        self.taxonomy_skills = load_file(tax_input_file_name, s3=s3)
+        data = pkg_resources.resource_stream('en_20230808', '/en_20230808-0.0.1/data/skill_ner_mapping/lightcast_data_formatted.csv')
+
+        with data as f:
+            self.taxonomy_skills = pd.read_csv(f)
         self.taxonomy_skills = self.taxonomy_skills[
             self.taxonomy_skills[self.skill_name_col].notna()
         ].reset_index(drop=True)
@@ -269,7 +265,10 @@ class SkillMapper:
     def load_taxonomy_embeddings(self, taxonomy_embedding_file_name, s3=True):
         """Load taxonomy embeddings from s3"""
 
-        saved_taxonomy_embeds = load_file(taxonomy_embedding_file_name, s3=s3)
+        data = pkg_resources.resource_stream('en_20230808', '/en_20230808-0.0.1/data/skill_ner_mapping/lightcast_embeddings.json')
+
+        with data as f:
+            saved_taxonomy_embeds = json.load(f)
 
         self.taxonomy_skills_embeddings_dict = {
             int(embed_indx): np.array(embedding)

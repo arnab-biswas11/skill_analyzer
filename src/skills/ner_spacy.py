@@ -35,6 +35,9 @@ import os
 from datetime import datetime as date
 from argparse import ArgumentParser
 import pickle
+import io
+import spacy
+import pkg_resources
 
 from spacy.util import minibatch, compounding, fix_random_seed
 # from spacy.training.example import Example
@@ -43,11 +46,19 @@ from spacy import displacy
 from tqdm import tqdm
 from nervaluate import Evaluator
 
+from src.skills.data_getters import (
+    get_s3_resource,
+    load_s3_data,
+    load_s3_json,
+    get_s3_data_paths,
+    save_json_dict,
+)
 from src.skills.ner_spacy_utils import (
     clean_entities_text,
 )
 from src.skills.multiskill_utils import MultiskillClassifier
 from src.skills.vars import bucket_name, logger, PROJECT_DIR
+
 
 
 class JobNER(object):
@@ -484,33 +495,21 @@ class JobNER(object):
             cmd = f"aws s3 sync {output_folder} s3://{self.BUCKET_NAME}/escoe_extension/{output_folder}"
             os.system(cmd)
 
-    def load_model(self, model_folder, s3_download=True):
-        if s3_download:
-            if "escoe_extension/" in model_folder:
-                s3_folder = model_folder
-                model_folder = model_folder.split("escoe_extension/")[1]
-            else:
-                s3_folder = os.path.join("escoe_extension/", model_folder)
-            # If we havent already downloaded it, do so
-            if not os.path.exists(model_folder):
-                # Download this model from S3
-                cmd = f"aws s3 sync s3://{self.BUCKET_NAME}/{s3_folder} {model_folder}"
-                os.system(cmd)
-        else:
-            logger.info("Loading the model from a local location")
-
+    def load_model(self):
         try:
-            logger.info(f"Loading the model from {model_folder}")
-            self.nlp = spacy.load(model_folder)
-            self.ms_classifier = pickle.load(
-                open(os.path.join(model_folder, "ms_classifier.pkl"), "rb")
+            logger.info(f"Loading the model")
+            self.nlp = spacy.load("en_20230808")
+
+            pkl_data = pkg_resources.resource_stream('en_20230808', '/en_20230808-0.0.1/ms_classifier.pkl')
+
+            with pkl_data as f:
+                self.ms_classifier = pickle.load(f)
+
+        except Exception as e:
+            logger.info(
+                "Model not found locally - you may need to download it", e
             )
-            return self.nlp
-        except OSError:
-            logger.warning(
-                "Model not found locally - you may need to download it from S3 (set s3_download to True)"
-            )
-            return None
+        return self.nlp
 
 
 def parse_arguments(parser):

@@ -9,8 +9,8 @@ python ojd_daps_skills/pipeline/skill_ner_mapping/taxonomy_matcher_embeddings.py
 import os
 import yaml
 
-from src.skill_ner_mapper import SkillMapper
-from src.skills import PROJECT_DIR
+from src.skills.skill_ner_mapper import SkillMapper
+from src.skills.vars import PROJECT_DIR
 from argparse import ArgumentParser
 
 if __name__ == "__main__":

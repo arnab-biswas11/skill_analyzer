@@ -9,6 +9,8 @@ from src.skills.skill_ner_mapper import SkillMapper
 from src.skills.extract_skills_utils import (
     load_toy_taxonomy,
 )
+from src.skills.data_getters import load_file
+from src.skills.download_public_data import download
 from src.skills.vars import logger, PROJECT_DIR, PUBLIC_DATA_FOLDER_NAME
 
 import yaml
@@ -16,6 +18,10 @@ import os
 import logging
 from typing import List, Union, Optional
 from src.skills.text_cleaning import short_hash
+import pkg_resources
+import json
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class ExtractSkills(object):
@@ -44,10 +50,12 @@ class ExtractSkills(object):
     ):
         # Set variables from the config file
         config_path = os.path.join(
-            PROJECT_DIR, config_name + ".yaml"
+            os.path.dirname(os.path.abspath(__file__)), config_name + ".yaml"
         )
+
         with open(config_path, "r") as f:
             self.config = yaml.load(f, Loader=yaml.FullLoader)
+            
         self.local = local
         self.verbose = verbose
         self.multi_process = multi_process
@@ -57,7 +65,17 @@ class ExtractSkills(object):
             logger.setLevel(logging.ERROR)
         if self.local:
             self.s3 = False
-            self.base_path = PUBLIC_DATA_FOLDER_NAME + "/"
+            self.base_path = ""
+            # self.base_path = PUBLIC_DATA_FOLDER_NAME + "/"
+            # if not os.path.exists(os.path.join(PROJECT_DIR, PUBLIC_DATA_FOLDER_NAME)):
+            #     logger.warning(
+            #         "Neccessary files are not downloaded. Downloading ~1GB of neccessary files."
+            #     )
+            #     download()
+        else:
+            self.base_path = ""
+            self.s3 = True
+            pass
 
         self.taxonomy_name = self.config["taxonomy_name"]
         self.taxonomy_path = os.path.join(self.base_path, self.config["taxonomy_path"])
@@ -92,7 +110,11 @@ class ExtractSkills(object):
 
         if self.local:
             self.ner_model_path = os.path.join(
-                PROJECT_DIR, self.base_path, self.config["ner_model_path"]
+                os.path.dirname(os.path.abspath(__file__)), self.base_path, self.config["ner_model_path"]
+            )
+        else:
+            self.ner_model_path = os.path.join(
+                self.base_path, self.config["ner_model_path"]
             )
 
     def load(
@@ -130,16 +152,21 @@ class ExtractSkills(object):
 
         self.job_ner = JobNER()
 
-        self.nlp = self.job_ner.load_model(self.ner_model_path, s3_download=self.s3)
+        self.nlp = self.job_ner.load_model()
 
-        self.labels = ("BENEFIT", "SKILL", "MULTISKILL", "EXPERIENCE")
+        self.labels = self.nlp.get_pipe("ner").labels + ("MULTISKILL",)
 
         logger.info(f"Loading '{self.taxonomy_name}' taxonomy information")
-
         if self.taxonomy_name == "toy":
             self.taxonomy_skills = load_toy_taxonomy()
         else:
-            self.hier_name_mapper = {}
+            if hier_name_mapper_file_name:
+                data = pkg_resources.resource_stream('en_20230808', '/en_20230808-0.0.1/data/skill_ner_mapping/lightcast_hier_mapper.json')
+                with data as f:
+                    self.hier_name_mapper = json.load(f)
+
+            else:
+                self.hier_name_mapper = {}
             self.config["hier_name_mapper"] = self.hier_name_mapper
 
         taxonomy_info_names = [
@@ -168,7 +195,7 @@ class ExtractSkills(object):
 
         if self.taxonomy_name != "toy":
             self.taxonomy_skills = self.skill_mapper.load_taxonomy_skills(
-                self.taxonomy_path, s3=self.s3
+                 s3=self.s3
             )
             self.taxonomy_skills = self.skill_mapper.preprocess_taxonomy_skills(
                 self.taxonomy_skills
@@ -192,6 +219,7 @@ class ExtractSkills(object):
             self.prev_skill_matches = self.skill_mapper.load_ojo_esco_mapper(
                 self.prev_skill_matches_file_name, s3=self.s3
             )
+            # self.prev_skill_matches = {1654958883999821: {'ojo_skill': 'maths skills', 'match_skill': 'communicate with others', 'match_score': 0.3333333333333333, 'match_type': 'most_common_level_1', 'match_id': 'S1.1'}}
         else:
             self.prev_skill_matches = None
 
@@ -202,6 +230,7 @@ class ExtractSkills(object):
             self.hard_coded_skills = self.skill_mapper.load_ojo_esco_mapper(
                 self.hard_labelled_skills_file_name, s3=self.s3
             )
+            # self.hard_coded_skills = {1654958883999821: {'ojo_skill': 'maths skills', 'match_skill': 'communicate with others', 'match_id': 'S1.1'}}
         else:
             self.hard_coded_skills = None
 
@@ -436,7 +465,7 @@ class ExtractSkills(object):
 
 if __name__ == "__main__":
 
-    es = ExtractSkills(config_name="extract_skills_lightcast", local=True)
+    es = ExtractSkills(config_name="extract_skills_esco", local=True)
 
     es.load()
 

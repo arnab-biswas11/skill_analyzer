@@ -8,6 +8,13 @@ import random
 import re
 from collections import defaultdict, Counter
 
+from src.skills.data_getters import (
+    get_s3_resource,
+    get_s3_data_paths,
+    load_s3_json,
+)
+from src.skills.vars import bucket_name
+
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (

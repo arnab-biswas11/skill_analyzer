@@ -3,7 +3,6 @@ import json
 import pickle
 import gzip
 import os
-
 import pandas as pd
 from pandas import DataFrame
 import boto3
@@ -11,6 +10,9 @@ from decimal import Decimal
 import numpy
 
 from src.skills.vars import bucket_name, PROJECT_DIR, logger
+
+aws_access_key_id = os.environ.get('aws_access_key_id')
+aws_secret_access_key = os.environ.get('aws_secret_access_key')
 
 
 class CustomJsonEncoder(json.JSONEncoder):
@@ -83,7 +85,12 @@ def load_txt_lines(file_name: str) -> list:
 
 
 def get_s3_resource():
-    s3 = boto3.resource("s3")
+    s3 = boto3.resource(
+        service_name = 's3',
+        region_name = 'ap-southeast-2',
+        aws_access_key_id = aws_access_key_id,
+        aws_secret_access_key = aws_secret_access_key
+    )    
     return s3
 
 
