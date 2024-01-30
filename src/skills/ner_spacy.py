@@ -44,7 +44,7 @@ from spacy.util import minibatch, compounding, fix_random_seed
 import spacy
 from spacy import displacy
 from tqdm import tqdm
-from nervaluate import Evaluator
+# from nervaluate import Evaluator
 
 from src.skills.data_getters import (
     get_s3_resource,
