@@ -59,12 +59,12 @@ This might give the result:
 - the skill level 1 group 'communicate verbally' (code 'A1.3') is the closest to thie ojo skill with distance 0.98
 """
 # from src.skills.vars import config, bucket_name, PROJECT_DIR, logger
-from src.skills.data_getters import (
-    get_s3_resource,
-    save_to_s3,
-    get_s3_data_paths,
-    load_file,
-)
+# from src.skills.data_getters import (
+#     get_s3_resource,
+#     save_to_s3,
+#     get_s3_data_paths,
+#     load_file,
+# )
 from src.skills.skill_ner_mapper_utils import (
     get_top_comparisons,
     get_most_common_code,
@@ -82,7 +82,7 @@ import pkg_resources
 import ast
 import json
 
-S3 = get_s3_resource()
+# S3 = get_s3_resource()
 
 
 class SkillMapper:
