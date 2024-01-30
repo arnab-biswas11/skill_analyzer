@@ -280,7 +280,7 @@ class JobNER(object):
             )
             return X, y
 
-        self.ms_classifier = MultiskillClassifier()
+        self.ms_classifier = MultiskillClassifier() 
         X_train, y_train = separate_labels(train_data, self.ms_classifier)
         X_test, y_test = separate_labels(test_data, self.ms_classifier)
 
@@ -391,10 +391,10 @@ class JobNER(object):
         doc = self.nlp(job_text)
         pred_ents = []
         for ent in doc.ents:
-            if ent.label_ == "SKILL":
-                # Apply the classifier to see whether it's likely to be a multiskill
-                if self.ms_classifier.predict(ent.text)[0] == 1:
-                    ent.label_ = "MULTISKILL"
+            # if ent.label_ == "SKILL":
+            #     # Apply the classifier to see whether it's likely to be a multiskill
+            #     if self.ms_classifier.predict(ent.text)[0] == 1:
+            #         ent.label_ = "MULTISKILL"
             if (len(ent.text) > 1) | (ent.text == "R") | (ent.text == "C"):
                 pred_ents.append(
                     {"label": ent.label_, "start": ent.start_char, "end": ent.end_char}
