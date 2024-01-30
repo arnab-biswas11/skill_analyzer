@@ -13,7 +13,6 @@ from collections import defaultdict, Counter
 #     get_s3_data_paths,
 #     load_s3_json,
 # )
-from src.skills.vars import bucket_name
 
 from sklearn import svm
 from sklearn.model_selection import train_test_split
