@@ -46,13 +46,13 @@ from spacy import displacy
 from tqdm import tqdm
 # from nervaluate import Evaluator
 
-from src.skills.data_getters import (
-    get_s3_resource,
-    load_s3_data,
-    load_s3_json,
-    get_s3_data_paths,
-    save_json_dict,
-)
+# from src.skills.data_getters import (
+#     get_s3_resource,
+#     load_s3_data,
+#     load_s3_json,
+#     get_s3_data_paths,
+#     save_json_dict,
+# )
 from src.skills.ner_spacy_utils import (
     clean_entities_text,
 )
