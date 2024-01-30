@@ -57,7 +57,7 @@ from src.skills.ner_spacy_utils import (
     clean_entities_text,
 )
 from src.skills.multiskill_utils import MultiskillClassifier
-from src.skills.vars import bucket_name, logger, PROJECT_DIR
+# from src.skills.vars import bucket_name, logger, PROJECT_DIR
 
 
 
@@ -497,7 +497,7 @@ class JobNER(object):
 
     def load_model(self):
         try:
-            logger.info(f"Loading the model")
+            # logger.info(f"Loading the model")
             self.nlp = spacy.load("en_20230808")
 
             pkl_data = pkg_resources.resource_stream('en_20230808', '/en_20230808-0.0.1/ms_classifier.pkl')
@@ -506,7 +506,7 @@ class JobNER(object):
                 self.ms_classifier = pickle.load(f)
 
         except Exception as e:
-            logger.info(
+            print(
                 "Model not found locally - you may need to download it", e
             )
         return self.nlp
