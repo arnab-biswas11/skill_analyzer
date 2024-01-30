@@ -133,10 +133,10 @@ class SkillMapper:
         self.skill_type_col = skill_type_col
         self.verbose = verbose
         self.multi_process = multi_process
-        if self.verbose:
-            # logger.setLevel(logging.INFO)
-        else:
-            # logger.setLevel(logging.ERROR)
+        # if self.verbose:
+        #     logger.setLevel(logging.INFO)
+        # else:
+        #     logger.setLevel(logging.ERROR)
         self.bert_model = BertVectorizer(
             verbose=self.verbose, multi_process=self.multi_process
         ).fit()
@@ -322,7 +322,7 @@ class SkillMapper:
                 e.g. {'skill_types': ['preferredLabel', 'altLabels'], 'hier_types': ["level_2", "level_3"],}
         """
 
-        if len(skill_hashes_filtered) == 0:
+        # if len(skill_hashes_filtered) == 0:
             # logger.error("Trying to map skills using empty dict of skills")
 
         clean_ojo_skill_embeddings = self.bert_model.transform(
