@@ -31,7 +31,7 @@ class BertVectorizer:
     def transform(self, texts):
         t0 = time.time()
         if self.multi_process:
-            logger.info(".. with multiprocessing")
+            # logger.info(".. with multiprocessing")
             pool = self.bert_model.start_multi_process_pool()
             self.embedded_x = self.bert_model.encode_multi_process(
                 texts, pool, batch_size=self.batch_size
