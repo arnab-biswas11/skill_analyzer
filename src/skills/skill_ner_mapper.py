@@ -58,7 +58,7 @@ This might give the result:
 - the skill level 0 group 'communication' (code 'A1') is the closest to thie ojo skill with distance 0.998
 - the skill level 1 group 'communicate verbally' (code 'A1.3') is the closest to thie ojo skill with distance 0.98
 """
-from src.skills.vars import config, bucket_name, PROJECT_DIR, logger
+# from src.skills.vars import config, bucket_name, PROJECT_DIR, logger
 from src.skills.data_getters import (
     get_s3_resource,
     save_to_s3,
@@ -134,9 +134,9 @@ class SkillMapper:
         self.verbose = verbose
         self.multi_process = multi_process
         if self.verbose:
-            logger.setLevel(logging.INFO)
+            # logger.setLevel(logging.INFO)
         else:
-            logger.setLevel(logging.ERROR)
+            # logger.setLevel(logging.ERROR)
         self.bert_model = BertVectorizer(
             verbose=self.verbose, multi_process=self.multi_process
         ).fit()
@@ -145,7 +145,7 @@ class SkillMapper:
         # load job skills here
 
         self.ojo_skills = load_file(ojo_skills_file_name, s3=s3)
-        logger.info("Loaded job skills")
+        # logger.info("Loaded job skills")
 
         return self.ojo_skills
 
@@ -192,7 +192,7 @@ class SkillMapper:
                     job_ad_skill_hashes.append(skill_hash)
                 self.clean_ojo_skills[ojo_job_id]["skill_hashes"] = job_ad_skill_hashes
 
-        logger.info("Cleaned job skills")
+        # logger.info("Cleaned job skills")
 
         return self.clean_ojo_skills, self.skill_hashes
 
@@ -222,7 +222,7 @@ class SkillMapper:
                 self.skill_hier_info_col
             ].apply(clean_string_list)
 
-        logger.info(f"Loaded '{self.taxonomy}' taxononmy skills")
+        # logger.info(f"Loaded '{self.taxonomy}' taxononmy skills")
 
         return self.taxonomy_skills
 
@@ -235,7 +235,7 @@ class SkillMapper:
 
         taxonomy_skills.replace({np.nan: None}).reset_index(inplace=True, drop=True)
 
-        logger.info(f"Preprocessed '{self.taxonomy}' taxononmy skills")
+        # logger.info(f"Preprocessed '{self.taxonomy}' taxononmy skills")
 
         return taxonomy_skills
 
@@ -260,7 +260,7 @@ class SkillMapper:
             taxonomy_embedding_file_name,
         )
 
-        logger.info(f"Saved embedded '{self.taxonomy}' taxonomy skills")
+        # logger.info(f"Saved embedded '{self.taxonomy}' taxonomy skills")
 
     def load_taxonomy_embeddings(self, taxonomy_embedding_file_name, s3=True):
         """Load taxonomy embeddings from s3"""
@@ -275,7 +275,7 @@ class SkillMapper:
             for embed_indx, embedding in saved_taxonomy_embeds.items()
         }
 
-        logger.info(f"Loaded '{self.taxonomy}' taxonomy embeddings")
+        # logger.info(f"Loaded '{self.taxonomy}' taxonomy embeddings")
 
         return self.taxonomy_skills_embeddings_dict
 
@@ -284,7 +284,7 @@ class SkillMapper:
 
         self.ojo_esco = load_file(ojo_esco_mapper_file_name, s3=s3)
 
-        logger.info(f"loaded extracted-skill-to-{self.taxonomy} mapper")
+        # logger.info(f"loaded extracted-skill-to-{self.taxonomy} mapper")
 
         return self.ojo_esco
 
@@ -292,7 +292,7 @@ class SkillMapper:
         """Saves final predictions as ojo_esco mapper"""
         save_to_s3(S3, bucket_name, skill_hash_to_esco, ojo_esco_mapper_file_name)
 
-        logger.info(f"saved extracted-skill-to-{self.taxonomy} mapper")
+        # logger.info(f"saved extracted-skill-to-{self.taxonomy} mapper")
 
     def filter_skill_hash(self, skill_hashes, ojo_esco):
         """Filters skill hashes for skills not in ojo esco look up table."""
@@ -302,9 +302,9 @@ class SkillMapper:
             if skill_hash not in ojo_esco.keys()
         }
 
-        logger.info(
-            f"Found {len(ojo_esco)} mappings already. {len(self.skill_hashes_filtered)} skills to map onto..."
-        )
+        # logger.info(
+        #     f"Found {len(ojo_esco)} mappings already. {len(self.skill_hashes_filtered)} skills to map onto..."
+        # )
 
         return self.skill_hashes_filtered
 
@@ -323,7 +323,7 @@ class SkillMapper:
         """
 
         if len(skill_hashes_filtered) == 0:
-            logger.error("Trying to map skills using empty dict of skills")
+            # logger.error("Trying to map skills using empty dict of skills")
 
         clean_ojo_skill_embeddings = self.bert_model.transform(
             list(skill_hashes_filtered.values())
@@ -502,7 +502,7 @@ class SkillMapper:
                     }
                 )
 
-        logger.info(f"Mapped extracted skills onto '{self.taxonomy}' taxonomy")
+        # logger.info(f"Mapped extracted skills onto '{self.taxonomy}' taxonomy")
 
         return self.final_match
 
