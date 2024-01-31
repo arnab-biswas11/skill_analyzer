@@ -122,7 +122,7 @@ def main():
 
     # User inputs
     input_role = st.text_input("Enter role")
-    input_page_limit = st.selectbox('Number of pages to be scrapped', ('1', '2', '5', '10'))
+    input_page_limit = st.selectbox('Number of pages to be scrapped', ('1', '3', '5', '7', '9'))
     
     uploaded_file=st.file_uploader("Upload your resume in PDF format",type="pdf",help="Please uplaod the pdf")
 
